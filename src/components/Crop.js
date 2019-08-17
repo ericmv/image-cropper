@@ -14,9 +14,11 @@ console.log('screenWidth', screenWidth);
 
 class Crop extends React.Component {
     _circleStyles = {style:{}};
-    _position = {style:{}};
+    _position = {style:{left: 0, right: 0, top: 0, bottom: 0}};
     circle = null;
     crop = null;
+    widthBoundary = 200;
+    heightBoundary = 350;
 
     // _topLeftCircleStyles = {style: {}}
     // _topRightCircleStyles = {style: {}}
@@ -96,44 +98,55 @@ class Crop extends React.Component {
 
     // Top Left functions
     _handleTopLeftPanResponderMove = (event, gestureState) => {
-       this._position.style.left = this._previousLeft + gestureState.dx;
-       this._position.style.top = this._previousTop + gestureState.dy;
+        const left = this._previousLeft + gestureState.dx;
+        const top = this._previousTop + gestureState.dy;
+        this.setLeft(left);
+        this.setTop(top);
        this._updateNativeStyles();
     };
 
     _handleTopLeftPanResponderEnd = (event, gestureState) => {
+        this._unHighlight();
         this._previousLeft += gestureState.dx;
         this._previousTop += gestureState.dy;
     };
 
     // Bottom Left functions
     _handleBottomLeftPanResponderMove = (event, gestureState) => {
-       this._position.style.left = this._previousLeft + gestureState.dx;
-       this._position.style.bottom = -(this._previousBottom + gestureState.dy);
+       const left = this._previousLeft + gestureState.dx;
+       const bottom = this._previousBottom + gestureState.dy;
+       this.setLeft(left);
+       this.setBottom(bottom);
        this._updateNativeStyles();
     };
 
     _handleBottomLeftPanResponderEnd = (event, gestureState) => {
+        this._unHighlight();
         this._previousLeft += gestureState.dx;
         this._previousBottom += gestureState.dy;
     };
 
     // Top Right functions
     _handleTopRightPanResponderMove = (event, gestureState) => {
-       this._position.style.right = -(this._previousRight + gestureState.dx);
-       this._position.style.top = (this._previousTop + gestureState.dy);
+       const right = this._previousRight + gestureState.dx;
+       const top = this._previousTop + gestureState.dy;
+       this.setRight(right);
+       this.setTop(top);
        this._updateNativeStyles();
     };
 
     _handleTopRightPanResponderEnd = (event, gestureState) => {
+        this._unHighlight();
         this._previousRight += gestureState.dx;
         this._previousTop += gestureState.dy;
     };
 
     // Bottom Right functions
     _handleBottomRightPanResponderMove = (event, gestureState) => {
-       this._position.style.right = -(this._previousRight + gestureState.dx);
-       this._position.style.bottom = -(this._previousBottom + gestureState.dy);
+       const right = this._previousRight + gestureState.dx;
+       const bottom = this._previousBottom + gestureState.dy;
+       this.setRight(right);
+       this.setBottom(bottom);
        this._updateNativeStyles();
     };
 
@@ -146,13 +159,10 @@ class Crop extends React.Component {
     };
 
 
-
-
-
-    _panResponder = PanResponder.create({
+    _cropBoxPanResponder = PanResponder.create({
         onStartShouldSetPanResponder: this._handleStartShouldSetPanResponder,
         onMoveShouldSetPanResponder: this._handleMoveShouldSetPanResponder,
-        onPanResponderGrant: this._handlePanResponderGrant2,
+        onPanResponderGrant: this._handlePanResponderGrant,
         onPanResponderMove: this._handlePanResponderMove,
         onPanResponderRelease: this._handlePanResponderEnd,
         onPanResponderTerminate: this._handlePanResponderEnd,
@@ -217,11 +227,40 @@ class Crop extends React.Component {
 
     setLeft(left: number) {
         if (left <= 0) {
-            this.position.left = 0;
-        } else if (left >= (this.widthBoundary - this.position.right)) {
-            this.position.left = this.widthBoundary - this.position.right;
+            this._position.style.left = 0;
+        } else if (left >= (this.widthBoundary - this._position.style.right)) {
+            this._position.style.left = this.widthBoundary - this._position.style.right;
         } else {
-            this.position.left = left;
+            this._position.style.left = left;
+        }
+    }
+    setRight(right: number) {
+        console.log('right', -right, 'vs', 100 - this._position.style.left)
+        if (right >= 0) {
+            this._position.style.right = 0;
+        } else if (-right >= this.widthBoundary - this._position.style.left) {
+            console.log('got in?')
+            this._position.style.right = this.widthBoundary - this._position.style.left;
+        } else {
+            this._position.style.right = -right;
+        }
+    }
+    setTop(top: number) {
+        if (top <= 0) {
+            this._position.style.top = 0;
+        } else if (top >= this.heightBoundary - this._position.style.bottom) {
+            this._position.style.top = this.heightBoundary - this._position.style.bottom;
+        } else {
+            this._position.style.top = top;
+        }
+    }
+    setBottom(bottom: number) {
+        if (bottom >= 0) {
+            this._position.style.bottom = 0;
+        } else if (-bottom >= this.heightBoundary - this._position.style.top) {
+            this._position.style.bottom = this.heightBoundary - this._position.style.top;
+        } else {
+            this._position.style.bottom = -bottom;
         }
     }
 }
