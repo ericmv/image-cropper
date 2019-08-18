@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { PanResponder, StyleSheet, View, Text, Dimensions, Image } from 'react-native';
+import { PanResponder, StyleSheet, View, Text, Dimensions, Image, ImageEditor } from 'react-native';
 // const React = require('react');
 // const {PanResponder, StyleSheet, View, Text} = require('react-native');
 const CIRCLE_SIZE = 50;
@@ -68,33 +68,32 @@ class Crop extends React.Component {
     }
     _handlePanResponderMove = (event, gestureState) => {
         const {dx, dy} = gestureState;
-
+        // console.log('dx, dy', dx, dy)
         let moveX;
         let moveY;
-        // move right
-        if (dx > 0) {
-            moveX = this._previousLeft + dx;
-            this.setLeft(moveX);
-        } else {
-            moveX = this._previousRight + dx;
-            this.setRight(moveY);
+        if (dx === 0 && dy === 0) {
+            return;
         }
-        if (dy > 0) {
-            moveY = this._previousTop + dy;
-            this.setTop(moveY);
-        } else {
-            moveY = this._previousBottom + dy;
-            this.setBottom(moveY);
-        }
+        const left = this._previousLeft + dx;
+        const right = this._previousRight + dx;
+        const top = this._previousTop + dy;
+        const bottom = this._previousBottom + dy;
+        // console.log('right', this._position.style.right)
+        this.setLeft(left);
+        this.setRight(right);
+        this.setTop(top);
+        this.setBottom(bottom);
+
         this._updateNativeStyles();
     };
 
     _handlePanResponderEnd = (event, gestureState) => {
+        const {dx, dy} = gestureState;
         // this._unHighlight();
-        // console.log('gesturedx', gestureState.dx);
-        // console.log('gesturedy', gestureState.dy);
-        // this._previousLeft += gestureState.dx;
-        // this._previousTop += gestureState.dy;
+        this._previousLeft += dx;
+        this._previousRight += dx;
+        this._previousTop += dy;
+        this._previousBottom += dy;
     };
 
     // Top Left functions
@@ -152,8 +151,8 @@ class Crop extends React.Component {
     };
 
     _handleBottomRightPanResponderEnd = (event, gestureState) => {
-        console.log('gesturedx', gestureState.dx);
-        console.log('gesturedy', gestureState.dy);
+        // console.log('gesturedx', gestureState.dx);
+        // console.log('gesturedy', gestureState.dy);
         this._unHighlight();
         this._previousRight += gestureState.dx;
         this._previousBottom += gestureState.dy;
@@ -212,20 +211,21 @@ class Crop extends React.Component {
     render() {
         return (
 
-                <View
-                    style={styles.crop}
-                    ref={crop => {
-                        this.crop = crop;
-                    }}
-                >
-                    <View style={styles.cropBox}></View>
-                    <View style={styles.topLeftCorner} {...this._topLeftPanResponder.panHandlers}></View>
-                    <View style={styles.topRightCorner} {...this._topRightPanResponder.panHandlers}></View>
-                    <View style={styles.bottomLeftCorner} {...this._bottomLeftPanResponder.panHandlers}></View>
-                    <View style={styles.bottomRightCorner} {...this._bottomRightPanResponder.panHandlers}></View>
-                </View>
+            <View
+                style={styles.crop}
+                ref={crop => {
+                    this.crop = crop;
+                }}
+            >
+                <View style={styles.cropBox} {...this._cropBoxPanResponder.panHandlers}></View>
+                <View style={styles.topLeftCorner} {...this._topLeftPanResponder.panHandlers}></View>
+                <View style={styles.topRightCorner} {...this._topRightPanResponder.panHandlers}></View>
+                <View style={styles.bottomLeftCorner} {...this._bottomLeftPanResponder.panHandlers}></View>
+                <View style={styles.bottomRightCorner} {...this._bottomRightPanResponder.panHandlers}></View>
+            </View>
         )
     }
+
 
     setLeft(left: number) {
         if (left <= 0) {
@@ -237,11 +237,11 @@ class Crop extends React.Component {
         }
     }
     setRight(right: number) {
-        console.log('right', -right, 'vs', 100 - this._position.style.left)
+        // console.log('right', -right, 'vs', 100 - this._position.style.left)
         if (right >= 0) {
             this._position.style.right = 0;
         } else if (-right >= this.widthBoundary - this._position.style.left) {
-            console.log('got in?')
+            // console.log('got in?')
             this._position.style.right = this.widthBoundary - this._position.style.left;
         } else {
             this._position.style.right = -right;

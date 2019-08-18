@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, View, Image, ImageBackground } from 'react-native';
+import { StyleSheet, Text, View, Image, ImageBackground, ImageEditor } from 'react-native';
 import Crop from './src/components/Crop';
 export default function App() {
   return (
@@ -18,14 +18,16 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#2d3436',
-    alignItems: 'center',
-    justifyContent: 'center',
+    // alignItems: 'center',
+    // justifyContent: 'center',
 
   },
   placeholder: {
-      width: 350,
-      height: 550,
+      // width: 350,
+      // height: 550,
       // borderWidth: 2,
+      flex: 1,
+      // position: 'absolute',
       borderColor: 'black',
   }
 });
