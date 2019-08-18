@@ -1,12 +1,14 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View, Image, ImageBackground } from 'react-native';
 import Crop from './src/components/Crop';
 export default function App() {
   return (
       <View style={styles.container}>
-        <View style={styles.placeholder}>
+        <ImageBackground source={require('./assets/DSC_0578.jpg')}
+        resizeMode="contain" style={styles.placeholder}>
+
             <Crop></Crop>
-        </View>
+        </ImageBackground>
       </View>
 
   );
@@ -15,7 +17,7 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#2d3436',
     alignItems: 'center',
     justifyContent: 'center',
 
@@ -23,7 +25,7 @@ const styles = StyleSheet.create({
   placeholder: {
       width: 350,
       height: 550,
-      borderWidth: 2,
-      borderColor: 'black'
+      // borderWidth: 2,
+      borderColor: 'black',
   }
 });

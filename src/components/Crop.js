@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { PanResponder, StyleSheet, View, Text, Dimensions } from 'react-native';
+import { PanResponder, StyleSheet, View, Text, Dimensions, Image } from 'react-native';
 // const React = require('react');
 // const {PanResponder, StyleSheet, View, Text} = require('react-native');
 const CIRCLE_SIZE = 50;
@@ -37,13 +37,13 @@ class Crop extends React.Component {
 
     _highlight() {
         // this._circleStyles.style.backgroundColor = 'blue';
-        this._position.style.backgroundColor = 'blue';
+        // this._position.style.backgroundColor = 'blue';
         this._updateNativeStyles();
     }
 
     _unHighlight() {
         // this._circleStyles.style.backgroundColor = 'grey';
-        this._position.style.backgroundColor = 'grey';
+        // this._position.style.backgroundColor = 'grey';
         this._updateNativeStyles();
     }
 
@@ -67,25 +67,26 @@ class Crop extends React.Component {
         this._highlight();
     }
     _handlePanResponderMove = (event, gestureState) => {
-        // const left = this._previousLeft + gestureState.dx;
-        // const top = this._previousTop + gestureState.dy;
-        // if (left <= 0) {
-        //     this._position.style.left = 0
-        // } else if (left + 250 > imageWidth) {
-        //     this._position.style.left = imageWidth - 250;
-        // } else {
-        //     this._position.style.left = left;
-        // }
-        // if (top <= 0) {
-        //     this._position.style.top = 0
-        // } else if (top + 350 > imageHeight) {
-        //     this._position.style.top = imageHeight - 350;
-        // } else {
-        //     this._position.style.top = top;
-        // }
-       // this._circleStyles.style.left = this._previousLeft + gestureState.dx;
-       // this._circleStyles.style.top = this._previousTop + gestureState.dy;
-       // this._updateNativeStyles();
+        const {dx, dy} = gestureState;
+
+        let moveX;
+        let moveY;
+        // move right
+        if (dx > 0) {
+            moveX = this._previousLeft + dx;
+            this.setLeft(moveX);
+        } else {
+            moveX = this._previousRight + dx;
+            this.setRight(moveY);
+        }
+        if (dy > 0) {
+            moveY = this._previousTop + dy;
+            this.setTop(moveY);
+        } else {
+            moveY = this._previousBottom + dy;
+            this.setBottom(moveY);
+        }
+        this._updateNativeStyles();
     };
 
     _handlePanResponderEnd = (event, gestureState) => {
@@ -210,6 +211,7 @@ class Crop extends React.Component {
 
     render() {
         return (
+
                 <View
                     style={styles.crop}
                     ref={crop => {
@@ -271,50 +273,70 @@ const styles = StyleSheet.create({
     // width: 250,
     // height: 350,
     flex: 1,
-    backgroundColor: 'grey',
     // borderRadius: CIRCLE_SIZE / 2,
-    opacity: .6,
     position: 'absolute',
     left: 0,
     bottom: 0,
     right: 0,
-    top: 0
+    top: 0,
+
+    opacity: 1
+  },
+  cropBox: {
+     flex: 1,
+     backgroundColor: '#D3D3D350',
+     // opacity: .4,
+     borderWidth: 1,
+     borderColor: 'white',
+     position: 'absolute',
+     left: 0,
+     bottom: 0,
+     right: 0,
+     top: 0,
   },
   container: {
     flex: 1,
-    height: 500,
+    // position: 'absolute'
   },
   topLeftCorner: {
       position: 'absolute',
-      left: 0,
-      top: 0,
-      width: 30,
-      height: 30,
-      borderWidth: 2,
+      left: -2,
+      top: -2,
+      width: 25,
+      height: 25,
+      borderTopWidth: 2,
+      borderLeftWidth: 2,
+      borderColor: 'white'
   },
   topRightCorner: {
       position: 'absolute',
-      right: 0,
-      top: 0,
-      width: 30,
-      height: 30,
-      borderWidth: 2,
+      right: -2,
+      top: -2,
+      width: 25,
+      height: 25,
+      borderTopWidth: 2,
+      borderRightWidth: 2,
+      borderColor: 'white'
   },
   bottomLeftCorner: {
       position: 'absolute',
-      left: 0,
-      bottom: 0,
-      width: 30,
-      height: 30,
-      borderWidth: 2,
+      left: -2,
+      bottom: -2,
+      width: 25,
+      height: 25,
+      borderBottomWidth: 2,
+      borderLeftWidth: 2,
+      borderColor: 'white'
   },
   bottomRightCorner: {
       position: 'absolute',
-      right: 0,
-      bottom: 0,
-      width: 30,
-      height: 30,
-      borderWidth: 2,
+      right: -2,
+      bottom: -2,
+      width: 25,
+      height: 25,
+      borderBottomWidth: 2,
+      borderRightWidth: 2,
+      borderColor: 'white'
   }
 });
 
