@@ -20,6 +20,8 @@ class Crop extends React.Component {
     widthBoundary = 200;
     heightBoundary = 350;
 
+
+
     // _topLeftCircleStyles = {style: {}}
     // _topRightCircleStyles = {style: {}}
     // _bottomLeftCircleStyles = {style: {}}
@@ -209,6 +211,7 @@ class Crop extends React.Component {
     })
 
     render() {
+        console.log('heightBoundary', this.props.heightBoundary);
         return (
 
             <View
