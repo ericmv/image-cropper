@@ -1,59 +1,20 @@
 
 import React from 'react';
-import { PanResponder, StyleSheet, View, Text, Dimensions, Image, ImageEditor } from 'react-native';
-// const React = require('react');
-// const {PanResponder, StyleSheet, View, Text} = require('react-native');
-const CIRCLE_SIZE = 50;
-const screenWidth = Math.round(Dimensions.get('window').width);
-const screenHeight = Math.round(Dimensions.get('window').height);
-
-const imageWidth = 350;
-const imageHeight = 550;
-
-console.log('screenWidth', screenWidth);
+import { PanResponder, StyleSheet, View, Text, Dimensions, Image, ImageEditor, Button } from 'react-native';
 
 class Crop extends React.Component {
-    _circleStyles = {style:{}};
-    _position = {style:{left: 0, right: 0, top: 0, bottom: 0}};
-    circle = null;
+    _position = {style:{left: 0, right: 0, top: this.props.topBoundary, bottom: 0}};
     crop = null;
-    widthBoundary = 200;
-    heightBoundary = 350;
-
-
-
-    // _topLeftCircleStyles = {style: {}}
-    // _topRightCircleStyles = {style: {}}
-    // _bottomLeftCircleStyles = {style: {}}
-    // _bottomRightCircleStyles = {style: {}}
-
-    // topLeftCircle = null;
-    // topRightCircle = null;
-    // bottomLeftCircle = null;
-    // bottomRightCircle = null;
+    widthBoundary = 300;
+    heightBoundary = 450;
 
     _previousLeft = 0;
     _previousTop = 0;
     _previousRight = 0;
     _previousBottom = 0;
 
-    _highlight() {
-        // this._circleStyles.style.backgroundColor = 'blue';
-        // this._position.style.backgroundColor = 'blue';
-        this._updateNativeStyles();
-    }
-
-    _unHighlight() {
-        // this._circleStyles.style.backgroundColor = 'grey';
-        // this._position.style.backgroundColor = 'grey';
-        this._updateNativeStyles();
-    }
-
     _updateNativeStyles() {
-        // console.log('this.circleStyles', this._circleStyles);
-        // this.circle && this.circle.setNativeProps(this._circleStyles);
-        // console.log('this.position.right', this._position.style.right);
-        this.crop  && this.crop.setNativeProps(this._position);
+        this.crop && this.crop.setNativeProps(this._position);
     }
 
     _handleStartShouldSetPanResponder = (event, gestureState) => {
@@ -62,11 +23,7 @@ class Crop extends React.Component {
     _handleMoveShouldSetPanResponder = (event, gestureState) => {
         return true;
     }
-    _handlePanResponderGrant2 = (event, gestureState) => {
-        // this._highlight();
-    }
     _handlePanResponderGrant = (event, gestureState) => {
-        this._highlight();
     }
     _handlePanResponderMove = (event, gestureState) => {
         const {dx, dy} = gestureState;
@@ -80,7 +37,7 @@ class Crop extends React.Component {
         const right = this._previousRight + dx;
         const top = this._previousTop + dy;
         const bottom = this._previousBottom + dy;
-        // console.log('right', this._position.style.right)
+
         this.setLeft(left);
         this.setRight(right);
         this.setTop(top);
@@ -91,7 +48,6 @@ class Crop extends React.Component {
 
     _handlePanResponderEnd = (event, gestureState) => {
         const {dx, dy} = gestureState;
-        // this._unHighlight();
         this._previousLeft += dx;
         this._previousRight += dx;
         this._previousTop += dy;
@@ -108,7 +64,6 @@ class Crop extends React.Component {
     };
 
     _handleTopLeftPanResponderEnd = (event, gestureState) => {
-        this._unHighlight();
         this._previousLeft += gestureState.dx;
         this._previousTop += gestureState.dy;
     };
@@ -123,7 +78,6 @@ class Crop extends React.Component {
     };
 
     _handleBottomLeftPanResponderEnd = (event, gestureState) => {
-        this._unHighlight();
         this._previousLeft += gestureState.dx;
         this._previousBottom += gestureState.dy;
     };
@@ -138,7 +92,6 @@ class Crop extends React.Component {
     };
 
     _handleTopRightPanResponderEnd = (event, gestureState) => {
-        this._unHighlight();
         this._previousRight += gestureState.dx;
         this._previousTop += gestureState.dy;
     };
@@ -153,9 +106,6 @@ class Crop extends React.Component {
     };
 
     _handleBottomRightPanResponderEnd = (event, gestureState) => {
-        // console.log('gesturedx', gestureState.dx);
-        // console.log('gesturedy', gestureState.dy);
-        this._unHighlight();
         this._previousRight += gestureState.dx;
         this._previousBottom += gestureState.dy;
     };
@@ -211,20 +161,24 @@ class Crop extends React.Component {
     })
 
     render() {
-        console.log('heightBoundary', this.props.heightBoundary);
+        const { style, topBoundary, bottomBoundary, handleCrop, height, width } = this.props;
+        console.log('style', style);
+        console.log('this.props.bottomBoundary', bottomBoundary)
         return (
-
-            <View
-                style={styles.crop}
-                ref={crop => {
-                    this.crop = crop;
-                }}
-            >
-                <View style={styles.cropBox} {...this._cropBoxPanResponder.panHandlers}></View>
-                <View style={styles.topLeftCorner} {...this._topLeftPanResponder.panHandlers}></View>
-                <View style={styles.topRightCorner} {...this._topRightPanResponder.panHandlers}></View>
-                <View style={styles.bottomLeftCorner} {...this._bottomLeftPanResponder.panHandlers}></View>
-                <View style={styles.bottomRightCorner} {...this._bottomRightPanResponder.panHandlers}></View>
+            <View style={styles.container}>
+                <Button style={styles.cropButton} title="Crop" onPress={() => handleCrop(this._position.style.top, this._position.style.right, this._position.style.bottom, this._position.style.left, width, height)}/>
+                <View
+                    style={style}
+                    ref={crop => {
+                        this.crop = crop;
+                    }}
+                >
+                    <View style={styles.cropBox} {...this._cropBoxPanResponder.panHandlers}></View>
+                    <View style={styles.topLeftCorner} {...this._topLeftPanResponder.panHandlers}></View>
+                    <View style={styles.topRightCorner} {...this._topRightPanResponder.panHandlers}></View>
+                    <View style={styles.bottomLeftCorner} {...this._bottomLeftPanResponder.panHandlers}></View>
+                    <View style={styles.bottomRightCorner} {...this._bottomRightPanResponder.panHandlers}></View>
+                </View>
             </View>
         )
     }
@@ -251,19 +205,15 @@ class Crop extends React.Component {
         }
     }
     setTop(top: number) {
-        if (top <= 0) {
-            this._position.style.top = 0;
-        } else if (top >= this.heightBoundary - this._position.style.bottom) {
-            this._position.style.top = this.heightBoundary - this._position.style.bottom;
+        if (top <= this.props.topBoundary) {
+            this._position.style.top = this.props.topBoundary;
         } else {
             this._position.style.top = top;
         }
     }
     setBottom(bottom: number) {
-        if (bottom >= 0) {
-            this._position.style.bottom = 0;
-        } else if (-bottom >= this.heightBoundary - this._position.style.top) {
-            this._position.style.bottom = this.heightBoundary - this._position.style.top;
+        if (bottom >= this.props.bottomBoundary) {
+            this._position.style.bottom = -this.props.bottomBoundary;
         } else {
             this._position.style.bottom = -bottom;
         }
@@ -296,6 +246,11 @@ const styles = StyleSheet.create({
      bottom: 0,
      right: 0,
      top: 0,
+  },
+  cropButton: {
+      position: 'absolute',
+      top: 10,
+      right: 0
   },
   container: {
     flex: 1,
