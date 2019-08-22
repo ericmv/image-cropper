@@ -179,10 +179,10 @@ class Crop extends React.Component {
                     }}
                 >
                     <View style={styles.cropBox} {...this._cropBoxPanResponder.panHandlers}></View>
-                    <View style={styles.topLeftCorner} {...this._topLeftPanResponder.panHandlers}></View>
-                    <View style={styles.topRightCorner} {...this._topRightPanResponder.panHandlers}></View>
-                    <View style={styles.bottomLeftCorner} {...this._bottomLeftPanResponder.panHandlers}></View>
-                    <View style={styles.bottomRightCorner} {...this._bottomRightPanResponder.panHandlers}></View>
+                    <View style={styles.topLeftCorner} {...this._topLeftPanResponder.panHandlers}><View style={styles.topLeftMarker}></View></View>
+                    <View style={styles.topRightCorner} {...this._topRightPanResponder.panHandlers}><View style={styles.topRightMarker}></View></View>
+                    <View style={styles.bottomLeftCorner} {...this._bottomLeftPanResponder.panHandlers}><View style={styles.bottomLeftMarker}></View></View>
+                    <View style={styles.bottomRightCorner} {...this._bottomRightPanResponder.panHandlers}><View style={styles.bottomRightMarker}></View></View>
                 </View>
             </View>
         )
@@ -258,43 +258,71 @@ const styles = StyleSheet.create({
   },
   topLeftCorner: {
       position: 'absolute',
+      left: 0,
+      top: 0,
+      width: 50,
+      height: 50,
+  },
+  topLeftMarker: {
+      position: 'absolute',
       left: -2,
       top: -2,
-      width: 25,
-      height: 25,
       borderTopWidth: 2,
       borderLeftWidth: 2,
-      borderColor: 'white'
+      borderColor: 'white',
+      width: 25,
+      height: 25
   },
   topRightCorner: {
       position: 'absolute',
-      right: -2,
-      top: -2,
-      width: 25,
-      height: 25,
-      borderTopWidth: 2,
-      borderRightWidth: 2,
-      borderColor: 'white'
+      right: 0,
+      top: 0,
+      width: 50,
+      height: 50,
+  },
+  topRightMarker: {
+    position: 'absolute',
+    right: -2,
+    top: -2,
+    borderTopWidth: 2,
+    borderRightWidth: 2,
+    borderColor: 'white',
+    width: 25,
+    height: 25
   },
   bottomLeftCorner: {
       position: 'absolute',
+      left: 0,
+      bottom: 0,
+      width: 50,
+      height: 50,
+  },
+  bottomLeftMarker: {
+      position: 'absolute',
       left: -2,
       bottom: -2,
-      width: 25,
-      height: 25,
       borderBottomWidth: 2,
       borderLeftWidth: 2,
-      borderColor: 'white'
+      borderColor: 'white',
+      width: 25,
+      height: 25
   },
   bottomRightCorner: {
       position: 'absolute',
+      right: 0,
+      bottom: 0,
+      width: 50,
+      height: 50,
+  },
+  bottomRightMarker: {
+      position: 'absolute',
       right: -2,
       bottom: -2,
-      width: 25,
-      height: 25,
       borderBottomWidth: 2,
       borderRightWidth: 2,
-      borderColor: 'white'
+      borderColor: 'white',
+      width: 25,
+      height: 25
   }
 });
 
