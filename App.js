@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import { StyleSheet, Text, View, Image, ImageBackground, ImageEditor, Modal, Dimensions, ImageStore } from 'react-native';
+import { StyleSheet, Text, View, Image, ImageBackground, ImageEditor, Modal, Dimensions, ImageStore, Button } from 'react-native';
 import Crop from './src/components/Crop';
 import ImagePicker from './src/components/ImagePicker';
 import * as FileSystem from 'expo-file-system';
@@ -94,7 +94,7 @@ export default function App() {
 
     const uri = image ? image.uri : './assets/DSC_0578.jpg';
     console.log('CROPPED URI', croppedUri);
-    return croppedUri ? <View style={styles.container}><Image style={styles.imageContainer} source={{uri: croppedUri}} resizeMode="contain"></Image></View> :
+    return croppedUri ? <View style={styles.container}><Image style={styles.imageContainer} source={{uri: croppedUri}} resizeMode="contain"></Image><Button onPress={() => setCroppedUri(null)} title='Reset'/></View> :
 
 
         <View style={styles.container}>

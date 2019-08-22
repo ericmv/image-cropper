@@ -3,7 +3,7 @@ import React from 'react';
 import { PanResponder, StyleSheet, View, Text, Dimensions, Image, ImageEditor, Button } from 'react-native';
 
 class Crop extends React.Component {
-    _position = {style:{left: 0, right: 0, top: this.props.topBoundary, bottom: 0}};
+    _position = {style:{left: 0, right: 0, top: this.props.topBoundary, bottom: -this.props.bottomBoundary}};
     crop = null;
     widthBoundary = 300;
     heightBoundary = 450;
@@ -30,28 +30,33 @@ class Crop extends React.Component {
         // console.log('dx, dy', dx, dy)
         let moveX;
         let moveY;
-        if (dx === 0 && dy === 0) {
-            return;
-        }
+
         const left = this._previousLeft + dx;
         const right = this._previousRight + dx;
         const top = this._previousTop + dy;
         const bottom = this._previousBottom + dy;
 
-        this.setLeft(left);
-        this.setRight(right);
-        this.setTop(top);
-        this.setBottom(bottom);
+        if (right < 0 ) this.setLeft(left);
+        if (left > 0) this.setRight(right);
+        if (bottom < this.props.bottomBoundary) this.setTop(top);
+        if (top > this.props.topBoundary) this.setBottom(bottom)
+
 
         this._updateNativeStyles();
     };
 
     _handlePanResponderEnd = (event, gestureState) => {
         const {dx, dy} = gestureState;
-        this._previousLeft += dx;
-        this._previousRight += dx;
+        if ((this._previousLeft + dx > 0) && (this._previousRight + dx < 0)) {
+          this._previousLeft += dx;
+          this._previousRight += dx;
+        }
+        // if (this._previousRight + dx < 0)
+        // else this._previousRight = 0;
         this._previousTop += dy;
         this._previousBottom += dy;
+        console.log('this._previousLeft', this._previousLeft);
+        console.log('this._previousRight', this._previousRight);
     };
 
     // Top Left functions
@@ -187,8 +192,6 @@ class Crop extends React.Component {
     setLeft(left: number) {
         if (left <= 0) {
             this._position.style.left = 0;
-        } else if (left >= (this.widthBoundary - this._position.style.right)) {
-            this._position.style.left = this.widthBoundary - this._position.style.right;
         } else {
             this._position.style.left = left;
         }
@@ -197,9 +200,6 @@ class Crop extends React.Component {
         // console.log('right', -right, 'vs', 100 - this._position.style.left)
         if (right >= 0) {
             this._position.style.right = 0;
-        } else if (-right >= this.widthBoundary - this._position.style.left) {
-            // console.log('got in?')
-            this._position.style.right = this.widthBoundary - this._position.style.left;
         } else {
             this._position.style.right = -right;
         }
