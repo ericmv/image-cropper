@@ -34,9 +34,6 @@ export default function App() {
         const y = Math.round((top - topBoundary) * imageToScreenHeightRatio);
         const width = Math.round((screenWidth - left - right) * imageToScreenWidthRatio);
         const height = Math.round((screenHeight - top - bottom) * imageToScreenHeightRatio);
-        // console.log('offset', x, y);
-        console.log('width of croppped image', width);
-        console.log('height of cropped image', height);
 
         const crop = {
             originX: x,
@@ -50,50 +47,52 @@ export default function App() {
         setCroppedUri(croppedImage.uri);
         setModalVisible(false);
         setImage(null);
-
-        // const cropData = {
-        //     offset: {x: 0, y: 0},
-        //     size: {width: 2048, height: 2048}
-        // };
-        // setModalVisible(false);
-        // setImage(null);
-        // function onSuccess(uri) {
-        //     console.log('uri of cropped image', uri);
-        //     setCroppedUri(uri);
-        //     // ImageStore.removeImageForTag(uri);
-        // }
-        // function onFailure(err) {
-        //     console.log('oh no');
-        // }
-        // ImageEditor.cropImage(image.uri, cropData, onSuccess, onFailure)
     }
     const widthToHeightRatio = image ? image.width / image.height : null;
-    const maxCropHeight = image ? Math.round(screenWidth / widthToHeightRatio) : 1;
-    const maxCropWidth = image ? screenWidth : 1;
-    // console.log('image.width', image ? image.width : null);
-    // console.log('image.height', image ? image.height: null);
-    console.log('screenWidth', screenWidth);
-    console.log('screenHeight', screenHeight);
+    const imageDisplayHeight = image ? Math.round(screenWidth / widthToHeightRatio) : 1;
+    const imageDisplayWidth = image ? screenWidth : 1;
 
-    // console.log('widthToHeightRatio', widthToHeightRatio);
-
-    console.log('imageHeight', maxCropHeight);
+    // console.log('screenWidth', screenWidth);
+    // console.log('screenHeight', screenHeight);
 
 
-    const topBoundary = (screenHeight - maxCropHeight) / 2;
+    console.log('imageHeight', imageDisplayHeight);
+
+
+    const topBoundary = (screenHeight - imageDisplayHeight) / 2;
     const bottomBoundary = -topBoundary;
+    const widthScale = 5;
+    const heightScale = 7;
+
+    const cropScale = widthScale / heightScale;
+
+    let maxCropWidth;
+    let maxCropHeight;
+    if ((imageDisplayWidth / widthScale) < (imageDisplayHeight / heightScale)) {
+        maxCropWidth = imageDisplayWidth;
+        maxCropHeight = (imageDisplayWidth * heightScale) / widthScale
+    } else {
+        maxCropHeight = imageDisplayHeight;
+        maxCropWidth = (imageDisplayHeight * widthScale) / heightScale;
+    }
+
+    console.log('maxCropWidth', maxCropWidth);
+    console.log('maxCropHeight', maxCropHeight);
+
+    const startingBottom = topBoundary + (imageDisplayHeight - maxCropHeight)
+    const startingRight = imageDisplayWidth - maxCropWidth;
     const cropBoxStyle = {
         position: 'absolute',
         flex: 1,
         opacity: 1,
         top: topBoundary,
-        bottom: topBoundary,
+        bottom: startingBottom,
         left: 0,
-        right: 0
+        right: startingRight,
     }
 
     const uri = image ? image.uri : './assets/DSC_0578.jpg';
-    console.log('CROPPED URI', croppedUri);
+    // console.log('CROPPED URI', croppedUri);
     return croppedUri ? <View style={styles.container}><Image style={styles.imageContainer} source={{uri: croppedUri}} resizeMode="contain"></Image><Button onPress={() => setCroppedUri(null)} title='Reset'/></View> :
 
 
@@ -111,7 +110,7 @@ export default function App() {
                     resizeMode="contain"
                     style={styles.imageContainer}>
                 </Image>
-                <Crop style={cropBoxStyle} topBoundary={topBoundary} bottomBoundary={bottomBoundary} handleCrop={handleCrop} height={maxCropHeight} width={maxCropWidth}/>
+                <Crop style={cropBoxStyle} topBoundary={topBoundary} bottomBoundary={bottomBoundary} handleCrop={handleCrop} height={imageDisplayHeight} width={imageDisplayWidth} startingBottom={startingBottom} startingRight={startingRight}/>
             </Modal>
         </View>
 
@@ -123,10 +122,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#2d3436',
-    // padding: 20
-    // alignItems: 'center',
-    // justifyContent: 'center',
-
   },
   imageContainer: {
       width: undefined,
@@ -137,6 +132,7 @@ const styles = StyleSheet.create({
       top: 0,
       left: 0,
       right: 0,
-      bottom: 0
+      bottom: 0,
+      backgroundColor: '#2d3436',
   }
 });

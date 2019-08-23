@@ -2,16 +2,21 @@
 import React from 'react';
 import { PanResponder, StyleSheet, View, Text, Dimensions, Image, ImageEditor, Button } from 'react-native';
 
+
+
+
 class Crop extends React.Component {
-    _position = {style:{left: 0, right: 0, top: this.props.topBoundary, bottom: -this.props.bottomBoundary}};
+    _position = {style:{left: 0, right: this.props.startingRight, top: this.props.topBoundary, bottom: this.props.startingBottom}};
     crop = null;
     widthBoundary = 300;
     heightBoundary = 450;
 
     _previousLeft = 0;
     _previousTop = 0;
-    _previousRight = 0;
-    _previousBottom = 0;
+    _previousRight = -this.props.startingRight;
+    _previousBottom = -this.props.startingBottom;
+
+
 
     _updateNativeStyles() {
         this.crop && this.crop.setNativeProps(this._position);
@@ -30,12 +35,13 @@ class Crop extends React.Component {
         // console.log('dx, dy', dx, dy)
         let moveX;
         let moveY;
+        console.log('this.previousRight', this._previousRight);
 
         const left = this._previousLeft + dx;
         const right = this._previousRight + dx;
         const top = this._previousTop + dy;
         const bottom = this._previousBottom + dy;
-
+        console.log('left', left);
         if (right < 0 ) this.setLeft(left);
         if (left > 0) this.setRight(right);
         if (bottom < this.props.bottomBoundary) this.setTop(top);
@@ -55,8 +61,8 @@ class Crop extends React.Component {
         // else this._previousRight = 0;
         this._previousTop += dy;
         this._previousBottom += dy;
-        console.log('this._previousLeft', this._previousLeft);
-        console.log('this._previousRight', this._previousRight);
+        // console.log('this._previousLeft', this._previousLeft);
+        // console.log('this._previousRight', this._previousRight);
     };
 
     // Top Left functions
@@ -254,6 +260,7 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
+
     // position: 'absolute'
   },
   topLeftCorner: {
