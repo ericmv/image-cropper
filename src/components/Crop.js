@@ -6,7 +6,7 @@ import { PanResponder, StyleSheet, View, Text, Dimensions, Image, ImageEditor, B
 
 
 class Crop extends React.Component {
-    _position = {style:{left: 0, right: this.props.startingRight, top: this.props.topBoundary, bottom: this.props.startingBottom}};
+    _position = {style:{left: 0, right: this.props.startingRight, top: 0, bottom: this.props.startingBottom}};
     crop = null;
     widthBoundary = 300;
     heightBoundary = 450;
@@ -35,17 +35,15 @@ class Crop extends React.Component {
         // console.log('dx, dy', dx, dy)
         let moveX;
         let moveY;
-        console.log('this.previousRight', this._previousRight);
 
         const left = this._previousLeft + dx;
         const right = this._previousRight + dx;
         const top = this._previousTop + dy;
         const bottom = this._previousBottom + dy;
-        console.log('left', left);
         if (right < 0 ) this.setLeft(left);
         if (left > 0) this.setRight(right);
-        if (bottom < this.props.bottomBoundary) this.setTop(top);
-        if (top > this.props.topBoundary) this.setBottom(bottom)
+        if (bottom < 0) this.setTop(top);
+        if (top > 0) this.setBottom(bottom)
 
 
         this._updateNativeStyles();
@@ -172,11 +170,10 @@ class Crop extends React.Component {
     })
 
     render() {
-        const { style, topBoundary, bottomBoundary, handleCrop, height, width } = this.props;
+        const { style, handleCrop, height, width, containerStyle } = this.props;
         console.log('style', style);
-        console.log('this.props.bottomBoundary', bottomBoundary)
         return (
-            <View style={styles.container}>
+            <View style={containerStyle}>
                 <Button style={styles.cropButton} title="Crop" onPress={() => handleCrop(this._position.style.top, this._position.style.right, this._position.style.bottom, this._position.style.left, width, height)}/>
                 <View
                     style={style}
@@ -203,7 +200,6 @@ class Crop extends React.Component {
         }
     }
     setRight(right: number) {
-        // console.log('right', -right, 'vs', 100 - this._position.style.left)
         if (right >= 0) {
             this._position.style.right = 0;
         } else {
@@ -211,15 +207,15 @@ class Crop extends React.Component {
         }
     }
     setTop(top: number) {
-        if (top <= this.props.topBoundary) {
-            this._position.style.top = this.props.topBoundary;
+        if (top <= 0) {
+            this._position.style.top = 0;
         } else {
             this._position.style.top = top;
         }
     }
     setBottom(bottom: number) {
-        if (bottom >= this.props.bottomBoundary) {
-            this._position.style.bottom = -this.props.bottomBoundary;
+        if (bottom >= 0) {
+            this._position.style.bottom = 0;
         } else {
             this._position.style.bottom = -bottom;
         }
