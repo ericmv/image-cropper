@@ -57,8 +57,13 @@ class Crop extends React.Component {
         }
         // if (this._previousRight + dx < 0)
         // else this._previousRight = 0;
-        this._previousTop += dy;
-        this._previousBottom += dy;
+
+        if ((this._previousTop + dy > 0) && (this._previousBottom + dy < 0)) {
+          this._previousTop += dy;
+          this._previousBottom += dy;
+        }
+        // this._previousTop += dy;
+        // this._previousBottom += dy;
         // console.log('this._previousLeft', this._previousLeft);
         // console.log('this._previousRight', this._previousRight);
     };
@@ -224,19 +229,7 @@ class Crop extends React.Component {
 
 
 const styles = StyleSheet.create({
-  crop: {
-    // width: 250,
-    // height: 350,
-    flex: 1,
-    // borderRadius: CIRCLE_SIZE / 2,
-    position: 'absolute',
-    left: 0,
-    bottom: 0,
-    right: 0,
-    top: 0,
 
-    opacity: 1
-  },
   cropBox: {
      flex: 1,
      backgroundColor: '#D3D3D350',
@@ -253,11 +246,6 @@ const styles = StyleSheet.create({
       position: 'absolute',
       top: 10,
       right: 0
-  },
-  container: {
-    flex: 1,
-
-    // position: 'absolute'
   },
   topLeftCorner: {
       position: 'absolute',
