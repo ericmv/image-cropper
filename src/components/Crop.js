@@ -16,6 +16,9 @@ class Crop extends React.Component {
     maxCropHeight = this.props.height - this.props.startingBottom;
     maxCropWidth = this.props.width - this.props.startingRight;
 
+    widthScale = 5;
+    heightScale = 7;
+
     _updateNativeStyles() {
         this.crop && this.crop.setNativeProps(this._position);
     }
@@ -101,66 +104,196 @@ class Crop extends React.Component {
 
     // Top Left functions
     _handleTopLeftPanResponderMove = (event, gestureState) => {
-        const left = this._previousLeft + gestureState.dx;
-        const top = this._previousTop + gestureState.dy;
-        this.setLeft(left);
-        this.setTop(top);
+        const average = (gestureState.dx + gestureState.dy) / 2;
+        const xScale = average;
+        const yScale = (average * this.heightScale) / this.widthScale;
+
+        const left = this._previousLeft + xScale;
+        const top = this._previousTop + yScale;
+
+        if (left > 0 && top > 0) {
+          this.setLeft(left);
+          this.setTop(top);
+        } else {
+          if (left <= 0) {
+            this.setLeft(0);
+
+            const currentWidth = this.props.width - this._position.style.right;
+            const currentHeight = (this.heightScale * currentWidth) / this.widthScale;
+            const currentTop = this.props.height - this._position.style.bottom - currentHeight;
+
+            this.setTop(currentTop)
+          } else if (top <= 0) {
+            this.setTop(0);
+            const currentHeight = this.props.height - this._position.style.bottom;
+            const currentWidth = (this.widthScale * currentHeight) / this.heightScale;
+            const currentLeft = this.props.width - this._position.style.right - currentWidth;
+            this.setLeft(currentLeft);
+          }
+        }
+
        this._updateNativeStyles();
     };
 
     _handleTopLeftPanResponderEnd = (event, gestureState) => {
-        this.setTopMaxCropHeight(gestureState.dy);
-        this.setLeftMaxCropWidth(gestureState.dx)
-        this._previousLeft += gestureState.dx;
-        this._previousTop += gestureState.dy;
+        const average = (gestureState.dx + gestureState.dy) / 2;
+        const xScale = average;
+        const yScale = (average * this.heightScale) / this.widthScale;
+        const left = this._previousLeft + xScale;
+        const top = this._previousTop + yScale;
+        if (left > 0 && top > 0) {
+          this.setTopMaxCropHeight(yScale);
+          this.setLeftMaxCropWidth(xScale)
+          this._previousLeft += xScale;
+          this._previousTop += yScale;
+        }
+
     };
 
     // Bottom Left functions
     _handleBottomLeftPanResponderMove = (event, gestureState) => {
-       const left = this._previousLeft + gestureState.dx;
-       const bottom = this._previousBottom + gestureState.dy;
-       this.setLeft(left);
-       this.setBottom(bottom);
-       this._updateNativeStyles();
+        const average = (gestureState.dx + gestureState.dy) / 2;
+        const xScale = average;
+        const yScale = (average * this.heightScale) / this.widthScale;
+
+        const left = this._previousLeft + xScale;
+        const bottom = this._previousBottom + yScale;
+        // this.setLeft(left);
+        // this.setBottom(bottom);
+
+
+        if (left > 0 && bottom < 0) {
+          this.setLeft(left);
+          this.setBottom(bottom);
+        } else {
+          if (left <= 0) {
+            this.setLeft(0);
+
+            const currentWidth = this.props.width - this._position.style.right;
+            const currentHeight = (this.heightScale * currentWidth) / this.widthScale;
+            const currentBottom = this.props.height - this._position.style.top - currentHeight;
+
+            this.setBottom(-currentBottom)
+          } else if (bottom >= 0) {
+            this.setBottom(0);
+            const currentHeight = this.props.height - this._position.style.top;
+            const currentWidth = (this.widthScale * currentHeight) / this.heightScale;
+            const currentLeft = this.props.width - this._position.style.right - currentWidth;
+            this.setLeft(currentLeft)
+          }
+        }
+
+
+        this._updateNativeStyles();
     };
 
     _handleBottomLeftPanResponderEnd = (event, gestureState) => {
-        this.setBottomMaxCropHeight(gestureState.dy);
-        this.setLeftMaxCropWidth(gestureState.dx)
-        this._previousLeft += gestureState.dx;
-        this._previousBottom += gestureState.dy;
+      const average = (gestureState.dx + gestureState.dy) / 2;
+      const xScale = average;
+      const yScale = (average * this.heightScale) / this.widthScale;
+      const left = this._previousLeft + xScale;
+      const bottom = this._previousBottom + yScale;
+      if (left > 0 && bottom < 0) {
+        this.setBottomMaxCropHeight(yScale);
+        this.setLeftMaxCropWidth(xScale)
+        this._previousLeft = left;
+        this._previousBottom = bottom;
+      }
     };
 
     // Top Right functions
     _handleTopRightPanResponderMove = (event, gestureState) => {
-       const right = this._previousRight + gestureState.dx;
-       const top = this._previousTop + gestureState.dy;
-       this.setRight(right);
-       this.setTop(top);
+      const average = (Math.abs(gestureState.dx) + Math.abs(gestureState.dy)) / 2;
+      const xScale = average;
+      const yScale = (average * this.heightScale) / this.widthScale;
+
+       const right = this._previousRight - xScale;
+       const top = this._previousTop + yScale;
+       console.log('right', right)
+       // this.setRight(right);
+       // this.setTop(top);
+       if (right < 0 && top > 0) {
+         this.setRight(right);
+         this.setTop(top);
+       } else {
+         if (right >= 0) {
+           this.setRight(0);
+
+           const currentWidth = this.props.width - this._position.style.left;
+           const currentHeight = (this.heightScale * currentWidth) / this.widthScale;
+           const currentTop = this.props.height - this._position.style.bottom - currentHeight;
+
+           this.setTop(currentTop)
+         } else if (top <= 0) {
+           this.setTop(0);
+           const currentHeight = this.props.height - this._position.style.bottom;
+           const currentWidth = (this.widthScale * currentHeight) / this.heightScale;
+           const currentRight = this.props.width - this._position.style.left - currentWidth;
+           this.setRight(currentRight);
+         }
+       }
        this._updateNativeStyles();
     };
 
     _handleTopRightPanResponderEnd = (event, gestureState) => {
-        this.setTopMaxCropHeight(gestureState.dy);
-        this.setRightMaxCropWidth(gestureState.dx)
-        this._previousRight += gestureState.dx;
-        this._previousTop += gestureState.dy;
+      const average = (gestureState.dx + gestureState.dy) / 2;
+      const xScale = average;
+      const yScale = (average * this.heightScale) / this.widthScale;
+      const right = this._previousRight + xScale;
+      const top = this._previousTop + yScale;
+      if (top > 0 && right < 0) {
+        this.setTopMaxCropHeight(yScale);
+        this.setRightMaxCropWidth(xScale);
+        this._previousRight = right;
+        this._previousTop = top;
+      }
     };
 
     // Bottom Right functions
     _handleBottomRightPanResponderMove = (event, gestureState) => {
-       const right = this._previousRight + gestureState.dx;
-       const bottom = this._previousBottom + gestureState.dy;
-       this.setRight(right);
-       this.setBottom(bottom);
+      const average = (gestureState.dx + gestureState.dy) / 2;
+      const xScale = average;
+      const yScale = (average * this.heightScale) / this.widthScale;
+
+       const right = this._previousRight + xScale;
+       const bottom = this._previousBottom + yScale;
+       // this.setRight(right);
+       // this.setBottom(bottom);
+       if (right < 0 && bottom < 0) {
+         this.setRight(right);
+         this.setBottom(bottom);
+       } else {
+         if (right >= 0) {
+           this.setRight(0);
+
+           const currentWidth = this.props.width - this._position.style.left;
+           const currentHeight = (this.heightScale * currentWidth) / this.widthScale;
+           const currentBottom = this.props.height - this._position.style.top - currentHeight;
+
+           this.setBottom(currentBottom)
+         } else if (bottom >= 0) {
+           this.setBottom(0);
+           const currentHeight = this.props.height - this._position.style.top;
+           const currentWidth = (this.widthScale * currentHeight) / this.heightScale;
+           const currentRight = this.props.width - this._position.style.left - currentWidth;
+           this.setRight(currentRight);
+         }
+       }
        this._updateNativeStyles();
     };
 
     _handleBottomRightPanResponderEnd = (event, gestureState) => {
-        this.setBottomMaxCropHeight(gestureState.dy)
-        this.setRightMaxCropWidth(gestureState.dx)
-        this._previousRight += gestureState.dx;
-        this._previousBottom += gestureState.dy;
+      const average = (gestureState.dx + gestureState.dy) / 2;
+      const xScale = average;
+      const yScale = (average * this.heightScale) / this.widthScale;
+      const right = this._previousRight + xScale;
+      const bottom = this._previousBottom + yScale;
+      if (right < 0 && bottom < 0) {
+        this.setBottomMaxCropHeight(yScale)
+        this.setRightMaxCropWidth(xScale)
+        this._previousRight = right;
+        this._previousBottom = bottom;
+      }
     };
 
 
@@ -233,7 +366,6 @@ class Crop extends React.Component {
             </View>
         )
     }
-
     setLeft(left: number) {
         if (left <= 0) {
             this._position.style.left = 0;
