@@ -316,7 +316,7 @@ class Cropbox extends React.Component {
             const currentHeight = (this.heightScale * currentWidth) / this.widthScale;
             const currentBottom = this.props.height - this._position.style.top - currentHeight;
 
-            this.setBottom(currentBottom)
+            this.setBottom(-currentBottom)
         } else if (bottom >= 0) {
             this.setBottom(0);
             const currentHeight = this.props.height - this._position.style.top;
@@ -342,7 +342,7 @@ class Cropbox extends React.Component {
           const currentBottom = this.props.height - this._position.style.top - currentHeight;
 
           this._previousRight = 0;
-          this._previousBottom = currentBottom;
+          this._previousBottom = -currentBottom;
           this.maxCropWidth = currentWidth;
           this.maxCropHeight = currentHeight;
       } else if (bottom >= 0) {
