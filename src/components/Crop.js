@@ -10,49 +10,43 @@ import * as ImageManipulator from 'expo-image-manipulator';
 const screenWidth = Math.round(Dimensions.get('window').width);
 const screenHeight = Math.round(Dimensions.get('window').height);
 
-export default function Crop() {
-    const [image, setImage] = useState(null);
+export default function Crop({uri, height, width, scaleX, scaleY, onCrop}) {
     const [modalVisible, setModalVisible] = useState(false);
-    const [croppedUri, setCroppedUri] = useState(null);
     const [displayWidth, setDisplayWidth] = useState(1);
     const [displayHeight, setDisplayHeight] = useState(1);
 
     useEffect(() => {
-        if (croppedUri) ImageStore.removeImageForTag(croppedUri);
-    }, [])
-
-    const handleConfirm = (image) => {
-        const widthToHeightRatio = image ? image.width / image.height : null;
-        const imageDisplayHeight = image ? Math.round(screenWidth / widthToHeightRatio) : 1;
-        const imageDisplayWidth = image ? screenWidth : 1;
-        setDisplayWidth(imageDisplayWidth);
-        setDisplayHeight(imageDisplayHeight);
-        setImage(image);
-        setModalVisible(true);
-    }
+        if (uri && height && width && scaleX && scaleY) {
+            const widthToHeightRatio = width / height;
+            const imageDisplayHeight = Math.round(screenWidth / widthToHeightRatio);
+            const imageDisplayWidth = screenWidth;
+            setDisplayWidth(imageDisplayWidth);
+            setDisplayHeight(imageDisplayHeight);
+            setModalVisible(true);
+        }
+    }, [uri, height, width, scaleX, scaleY]);
 
     const handleClose = () => {
         setModalVisible(false);
     }
     const handleCrop = async (top, right, bottom, left, boxWidth, boxHeight) => {
-        const imageToScreenWidthRatio = image.width / boxWidth;
-        const imageToScreenHeightRatio = image.height / boxHeight;
+        const imageToScreenWidthRatio = width / boxWidth;
+        const imageToScreenHeightRatio = height / boxHeight;
         const x = Math.round(left * imageToScreenWidthRatio);
         const y = Math.round(top * imageToScreenHeightRatio);
-        const width = Math.round((screenWidth - left - right) * imageToScreenWidthRatio);
-        const height = Math.round((displayHeight - top - bottom) * imageToScreenHeightRatio);
+        const cropWidth = Math.round((screenWidth - left - right) * imageToScreenWidthRatio);
+        const cropHeight = Math.round((displayHeight - top - bottom) * imageToScreenHeightRatio);
         const crop = {
             originX: x,
             originY: y,
-            width: width,
-            height: height
+            width: cropWidth,
+            height: cropHeight
         }
 
-        const croppedImage = await ImageManipulator.manipulateAsync(image.uri, [{crop}], {format: 'jpeg'});
-
-        setCroppedUri(croppedImage.uri);
-        setModalVisible(false);
-        setImage(null);
+        const croppedImage = await ImageManipulator.manipulateAsync(uri, [{crop}], {format: 'jpeg'});
+        onCrop(croppedImage);
+        // setCroppedUri(croppedImage.uri);
+        handleClose();
     }
 
     const topBoundary = (screenHeight - displayHeight) / 2;
@@ -89,10 +83,8 @@ export default function Crop() {
       right: 0
     }
 
-    const uri = image ? image.uri : './assets/DSC_0578.jpg';
-    return croppedUri ? <View style={styles.container}><Image style={styles.imageContainer} source={{uri: croppedUri}} resizeMode="contain"></Image><Button onPress={() => setCroppedUri(null)} title='Reset'/></View> :
+    return (
         <View style={styles.container}>
-          <ImagePicker onConfirm ={handleConfirm}/>
           <Modal animationType="slide"
              transparent={false}
              visible={modalVisible}
@@ -108,6 +100,7 @@ export default function Crop() {
                 <Cropbox style={cropBoxStyle} containerStyle={containerStyle} handleCrop={handleCrop} height={displayHeight} width={displayWidth} startingBottom={startingBottom} startingRight={startingRight}/>
             </Modal>
         </View>
+    )
 }
 
 const styles = StyleSheet.create({
