@@ -2,7 +2,6 @@ import React, {useState, useEffect} from 'react';
 import { StyleSheet, Text, View, Image, Modal, Dimensions, ImageStore, Button } from 'react-native';
 import Cropbox from './Cropbox';
 import ImagePicker from './ImagePicker';
-
 import * as FileSystem from 'expo-file-system';
 import * as ImageManipulator from 'expo-image-manipulator';
 
@@ -10,24 +9,40 @@ import * as ImageManipulator from 'expo-image-manipulator';
 const screenWidth = Math.round(Dimensions.get('window').width);
 const screenHeight = Math.round(Dimensions.get('window').height);
 
-export default function Crop({uri, height, width, scaleX, scaleY, onCrop}) {
-    const [modalVisible, setModalVisible] = useState(false);
-    const [displayWidth, setDisplayWidth] = useState(1);
-    const [displayHeight, setDisplayHeight] = useState(1);
+export default function Crop({uri, height, width, scaleX, scaleY, onCrop, onClose}) {
+    const [displayWidth, setDisplayWidth] = useState(null);
+    const [displayHeight, setDisplayHeight] = useState(null);
+    const [containerHeight, setContainerHeight] = useState(null);
+    const [containerWidth, setContainerWidth] = useState(null);
+
+    // useEffect(() => {
+    //     if (uri && height && width && scaleX && scaleY) {
+    //         const widthToHeightRatio = width / height;
+    //         const imageDisplayHeight = Math.round(screenWidth / widthToHeightRatio);
+    //         const imageDisplayWidth = screenWidth;
+    //         setDisplayWidth(imageDisplayWidth);
+    //         setDisplayHeight(imageDisplayHeight);
+    //     }
+    // }, [uri, height, width, scaleX, scaleY]);
 
     useEffect(() => {
-        if (uri && height && width && scaleX && scaleY) {
+        if (containerHeight && containerWidth) {
             const widthToHeightRatio = width / height;
-            const imageDisplayHeight = Math.round(screenWidth / widthToHeightRatio);
-            const imageDisplayWidth = screenWidth;
+            const imageDisplayHeight = Math.round(containerWidth / widthToHeightRatio);
+            const imageDisplayWidth = containerWidth;
             setDisplayWidth(imageDisplayWidth);
             setDisplayHeight(imageDisplayHeight);
-            setModalVisible(true);
         }
-    }, [uri, height, width, scaleX, scaleY]);
+    }, [containerHeight, containerWidth]);
 
     const handleClose = () => {
         setModalVisible(false);
+    }
+    const onPageLayout = (event) => {
+        const { width, height } = event.nativeEvent.layout;
+        setContainerHeight(height);
+        setContainerWidth(width);
+        console.log("ON LAYOUT",width, height);
     }
     const handleCrop = async (top, right, bottom, left, boxWidth, boxHeight) => {
         const imageToScreenWidthRatio = width / boxWidth;
@@ -45,11 +60,13 @@ export default function Crop({uri, height, width, scaleX, scaleY, onCrop}) {
 
         const croppedImage = await ImageManipulator.manipulateAsync(uri, [{crop}], {format: 'jpeg'});
         onCrop(croppedImage);
+
+        onClose();
         // setCroppedUri(croppedImage.uri);
-        handleClose();
+
     }
 
-    const topBoundary = (screenHeight - displayHeight) / 2;
+    const topBoundary = ((containerHeight - displayHeight) / 2);
     const widthScale = 5;
     const heightScale = 7;
 
@@ -84,21 +101,12 @@ export default function Crop({uri, height, width, scaleX, scaleY, onCrop}) {
     }
 
     return (
-        <View style={styles.container}>
-          <Modal animationType="slide"
-             transparent={false}
-             visible={modalVisible}
-             style={{backgroundColor: 'grey'}}
-             onRequestClose={() => {
-               Alert.alert('Modal has been closed.');
-             }}>
-                <Image
-                    source={{uri}}
-                    resizeMode="contain"
-                    style={styles.imageContainer}>
-                </Image>
-                <Cropbox style={cropBoxStyle} containerStyle={containerStyle} handleCrop={handleCrop} height={displayHeight} width={displayWidth} startingBottom={startingBottom} startingRight={startingRight}/>
-            </Modal>
+
+        <View style={styles.container} onLayout={onPageLayout}>
+            <Image source={{uri}} resizeMode="contain" style={styles.imageContainer} />
+            {
+                displayWidth && displayHeight && <Cropbox style={cropBoxStyle} containerStyle={containerStyle} handleCrop={handleCrop} height={displayHeight} width={displayWidth} startingBottom={startingBottom} startingRight={startingRight}/>
+            }
         </View>
     )
 }
@@ -106,18 +114,20 @@ export default function Crop({uri, height, width, scaleX, scaleY, onCrop}) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#2d3436',
+    backgroundColor: 'red',
+    // marginRight: 50,
+    // marginLeft: 50
   },
   imageContainer: {
       width: undefined,
       height: undefined,
       // borderWidth: 2,
       flex: 1,
-      position: 'absolute',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
+      // position: 'absolute',
+      // top: 0,
+      // left: 0,
+      // right: 0,
+      // bottom: 0,
       backgroundColor: '#2d3436',
   }
 });
