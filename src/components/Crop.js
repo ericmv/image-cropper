@@ -114,7 +114,7 @@ export default function Crop({uri, height, width, scaleX, scaleY, onCrop, onClos
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'red',
+    // backgroundColor: 'transparent',
     // marginRight: 50,
     // marginLeft: 50
   },
@@ -128,6 +128,6 @@ const styles = StyleSheet.create({
       // left: 0,
       // right: 0,
       // bottom: 0,
-      backgroundColor: '#2d3436',
+      backgroundColor: 'transparent',
   }
 });
