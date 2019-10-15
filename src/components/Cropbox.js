@@ -103,7 +103,6 @@ class Cropbox extends React.Component {
 
         const left = this._previousLeft + xScale;
         const top = this._previousTop + yScale;
-        console.log('left', left);
         if (left <= 0 && this._position.style.top > 0) {
             this.setLeft(0);
 
@@ -132,7 +131,8 @@ class Cropbox extends React.Component {
         const yScale = (average * this.heightScale) / this.widthScale;
         const left = this._previousLeft + xScale;
         const top = this._previousTop + yScale;
-        if (left <= 0) {
+        if (left <= 0 && this._position.style.top > 0) {
+          console.log('1')
             this._previousLeft = 0;
 
             const currentWidth = this.props.width - this._position.style.right;
@@ -142,7 +142,8 @@ class Cropbox extends React.Component {
             this.maxCropWidth = currentWidth;
             this.maxCropHeight = currentHeight;
             this._previousTop = currentTop;
-        } else if (top <= 0) {
+        } else if (top <= 0 && this._position.style.left > 0) {
+            console.log('2')
             this._previousTop = 0;
             const currentHeight = this.props.height - this._position.style.bottom;
             const currentWidth = (this.widthScale * currentHeight) / this.heightScale;
@@ -150,7 +151,8 @@ class Cropbox extends React.Component {
             this.maxCropWidth = currentWidth;
             this.maxCropHeight = currentHeight;
             this._previousLeft = currentLeft;
-        } else  if (left > 0 && top > 0){
+        } else if (left > 0 && top > 0){
+            console.log('3')
             this.setTopMaxCropHeight(yScale);
             this.setLeftMaxCropWidth(xScale);
           this._previousLeft = left;
@@ -202,7 +204,7 @@ class Cropbox extends React.Component {
 
       const left = this._previousLeft + xScale;
       const bottom = this._previousBottom - yScale;
-      if (left <= 0) {
+      if (left <= 0 && this._position.style.bottom > 0) {
         this._previousLeft = 0;
         const currentWidth = this.props.width - this._position.style.right;
         const currentHeight = (this.heightScale * currentWidth) / this.widthScale;
@@ -212,7 +214,7 @@ class Cropbox extends React.Component {
         this.maxCropHeight = currentHeight;
         // this.setBottomMaxCropHeight(yScale);
         // this.setLeftMaxCropWidth(xScale)
-      } else if (bottom >= 0) {
+      } else if (bottom >= 0 && this._position.style.left > 0) {
         this._previousBottom = 0;
         const currentHeight = this.props.height - this._position.style.top;
         const currentWidth = (this.widthScale * currentHeight) / this.heightScale;
@@ -275,7 +277,7 @@ class Cropbox extends React.Component {
 
         const right = this._previousRight - xScale;
         const top = this._previousTop + yScale;
-        if (right >= 0 && top > 0) {
+        if (right >= 0 && this._position.style.top > 0) {
           this._previousRight = 0;
 
           const currentWidth = this.props.width - this._position.style.left;
@@ -285,7 +287,7 @@ class Cropbox extends React.Component {
           this._previousTop = currentTop;
           this.maxCropWidth = currentWidth;
           this.maxCropHeight = currentHeight;
-        } else if (top <= 0 && right < 0) {
+        } else if (top <= 0 && this._position.style.right > 0) {
           this._previousTop = 0;
           const currentHeight = this.props.height - this._position.style.bottom;
           const currentWidth = (this.widthScale * currentHeight) / this.heightScale;
@@ -337,7 +339,8 @@ class Cropbox extends React.Component {
       const yScale = (average * this.heightScale) / this.widthScale;
       const right = this._previousRight + xScale;
       const bottom = this._previousBottom + yScale;
-      if (right >= 0 && bottom < 0) {
+
+      if (right >= 0 && this._position.style.bottom > 0) {
           const currentWidth = this.props.width - this._position.style.left;
           const currentHeight = (this.heightScale * currentWidth) / this.widthScale;
           const currentBottom = this.props.height - this._position.style.top - currentHeight;
@@ -346,7 +349,7 @@ class Cropbox extends React.Component {
           this._previousBottom = -currentBottom;
           this.maxCropWidth = currentWidth;
           this.maxCropHeight = currentHeight;
-      } else if (bottom >= 0 && right < 0) {
+      } else if (bottom >= 0 && this._position.style.right > 0) {
           const currentHeight = this.props.height - this._position.style.top;
           const currentWidth = (this.widthScale * currentHeight) / this.heightScale;
           const currentRight = this.props.width - this._position.style.left - currentWidth;
