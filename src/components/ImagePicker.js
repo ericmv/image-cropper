@@ -43,6 +43,7 @@ class ImagePicker extends React.Component {
     }
 
     selectTile = (item, index) => {
+        console.log('item', item);
         const selected = this.state.selected;
         if (!selected[index]) {
             selected[index] = item;
